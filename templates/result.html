@@ -1,22 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Result</title>
     <style>
+      html,
+      body {
+        height: 100%; /* Ensure full height */
+        margin: 0; /* Remove default margin */
+      }
       body {
         font-family: Arial, sans-serif;
         background-color: #222; /* Dark background */
         color: #fff; /* Light text */
-        margin: 0;
-        height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
+        position: relative; /* Added to position the back button */
       }
       .container {
         width: 100vw; /* Full viewport width */
-        height: 100vh; /* Full viewport height */
+        height: 120vh; /* Full viewport height */
         margin: 0;
         padding: 0;
         display: flex;
@@ -31,25 +36,57 @@
         padding: 0;
         border: none;
       }
-      a {
+      .back-button {
         position: absolute;
-        bottom: 10px;
+        top: 10px; /* Positioning at the top */
+        left: 10px; /* Positioning on the left */
         text-decoration: none;
-        color: #007bff; /* Link color */
-        font-size: 16px;
-        background-color: rgba(255, 255, 255, 0.8); /* Link background */
-        padding: 10px;
-        border-radius: 4px;
+        background-color: transparent; /* Transparent background */
+        border: none; /* No border */
+        cursor: pointer; /* Pointer cursor on hover */
       }
-      a:hover {
-        text-decoration: underline;
+      .back-button svg {
+        width: 24px; /* Width of the icon */
+        height: 24px; /* Height of the icon */
+        fill: #007bff; /* Color of the icon */
+        transform: scaleX(-1); /* Flip horizontally */
+        transition: transform 0.2s; /* Smooth transition for hover effect */
+      }
+      .back-button:hover svg {
+        transform: scaleX(-1) scale(1.1); /* Slightly enlarge the icon on hover */
+      }
+      .download-button {
+        margin-top: 20px;
+        position: absolute;
+        bottom: 20px; /* Positioning at the bottom */
+        text-decoration: none;
+        color: #fff; /* Light text color */
+        font-size: 16px;
+        background-color: rgba(
+          0,
+          123,
+          255,
+          0.8
+        ); /* Slightly transparent blue */
+        padding: 12px 20px; /* Padding around text */
+        border-radius: 4px;
+        border: none; /* No border */
+        transition: background-color 0.2s; /* Smooth transition */
+      }
+      .download-button:hover {
+        background-color: rgba(0, 123, 255, 1); /* Solid blue on hover */
       }
     </style>
   </head>
   <body>
+    <a href="/" class="back-button" aria-label="Back">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12 2L10.59 3.41 17.17 10H2v2h15.17l-6.58 6.59L12 22l10-10z" />
+      </svg>
+    </a>
     <div class="container">
       <img src="{{ img_path }}" alt="Plot" />
-      <a href="/download">Download Image</a>
+      <a href="/download" class="download-button">Download Image</a>
     </div>
   </body>
 </html>

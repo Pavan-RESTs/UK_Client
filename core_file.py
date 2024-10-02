@@ -6,7 +6,7 @@ from matplotlib import font_manager as fm
 import matplotlib.patches as patches
 import random
 
-def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,l=7.2,b=7.2, colors = []):
+def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,l=7.2,b=7.2, colors = [], format="png"):
     if whitey==False:
         lw = 0
 
@@ -333,7 +333,8 @@ def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,
     circle_radius1 = 1 
     circle1 = patches.Circle((0, 0), radius=circle_radius1, edgecolor='black' if whitey else 'white', facecolor='none', linewidth=lw) 
     ax.add_artist(circle1)
-    plt.savefig('./static/results/plot.png', dpi=dpi1, bbox_inches='tight', transparent=True)
+    plt.savefig(f'./static/results/plot.{format}', dpi=dpi1, bbox_inches='tight', transparent=True)
+    plt.savefig(f'./static/results/plot.png', dpi=dpi1, bbox_inches='tight', transparent=True)
 
     
 

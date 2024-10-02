@@ -29,10 +29,11 @@
         color: #fff; /* Light text for headings */
       }
       input[type="file"] {
-        margin-bottom: 20px;
+        margin-bottom: 0px;
       }
       input[type="submit"] {
-        background-color: #4caf50; /* Green submit button */
+        display: inline;
+        background-color: rgba(0, 123, 255, 0.8);
         color: #fff;
         border: none;
         padding: 10px 20px;
@@ -40,8 +41,9 @@
         cursor: pointer;
         font-size: 16px;
       }
+
       input[type="submit"]:hover {
-        background-color: #45a049; /* Darker green on hover */
+        background-color: rgba(0, 123, 255, 0.8);
       }
       input[type="submit"]:disabled {
         background-color: #777; /* Disabled button color */
@@ -67,9 +69,43 @@
         max-width: 20px; /* Adjust as needed */
         max-height: 20px; /* Adjust as needed */
       }
+      #customText {
+        width: 50%; /* Full width */
+        padding: 10px; /* Padding around the text */
+        border: 1px solid #ccc; /* Border around the text field */
+        border-radius: 4px; /* Rounded corners */
+        font-size: 16px; /* Font size */
+        margin-bottom: 10px; /* Margin below the text field */
+      }
+      #fileFormat {
+        width: 24%; /* Full width */
+        padding: 10px; /* Padding around the dropdown */
+        border: 1px solid #ccc; /* Border around the dropdown */
+        border-radius: 4px; /* Rounded corners */
+        font-size: 16px; /* Font size */
+        margin-bottom: 10px; /* Margin below the dropdown */
+      }
       #colorCount {
         margin-top: 10px;
         font-weight: bold;
+      }
+      .spinner {
+        margin: 0 auto;
+        width: 40px;
+        height: 40px;
+        border: 5px solid rgba(255, 255, 255, 0.2);
+        border-top: 5px solid rgba(0, 123, 255, 0.8);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
     </style>
   </head>
@@ -91,8 +127,23 @@
           </div>
         </div>
         <br />
+        <input
+          type="text"
+          id="customText"
+          placeholder="Enter plot name (Upto 12 Characters)"
+        />
+        <br />
+        <select id="fileFormat">
+          <option value="png">PNG (Transparent)</option>
+          <option value="jpg">JPG</option>
+          <option value="jpeg">JPEG</option>
+        </select>
         <input type="submit" value="Submit" id="submitBtn" disabled />
       </form>
+      <div id="loading" style="display: none; text-align: center">
+        <div class="spinner"></div>
+        <p>Loading, please wait...</p>
+      </div>
     </div>
     <script>
       const csvFile = document.getElementById("csvFile");
@@ -317,14 +368,22 @@
       function updateColorCount(selectedCount) {
         colorCountDiv.textContent = `Select ${requiredColors} colors (${selectedCount}/${requiredColors} selected)`;
       }
-
       uploadForm.addEventListener("submit", (event) => {
         event.preventDefault();
+
+        // Show loading spinner
+        document.getElementById("loading").style.display = "block";
+
         const formData = new FormData(uploadForm);
         const selectedColors = Array.from(
           document.querySelectorAll('input[name="colors"]:checked')
         ).map((checkbox) => checkbox.value);
+        const customText = document.getElementById("customText").value;
+        const fileFormat = document.getElementById("fileFormat").value;
+
         formData.append("selectedColors", JSON.stringify(selectedColors));
+        formData.append("customText", customText);
+        formData.append("fileFormat", fileFormat);
 
         fetch("/upload", {
           method: "POST",

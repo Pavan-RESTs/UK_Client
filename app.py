@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, send_file, jsonify
+from flaskwebgui import FlaskUI
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,12 +8,20 @@ import matplotlib.colors as mcolors
 from matplotlib import font_manager as fm
 import matplotlib.patches as patches
 import random
+import webbrowser
+from threading import Timer
 import json
 from core_file import giveFig
 
+
+
 random.seed(38)
+def open_browser():
+    webbrowser.open_new('http://127.0.0.1:5000/')
 
 app = Flask(__name__)
+
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['RESULT_FOLDER'] = 'static/results'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -54,20 +63,28 @@ def upload_file():
         df = pd.read_csv(filepath)
         
         selected_colors = json.loads(request.form.get('selectedColors', '[]'))
+        custom_text = request.form.get('customText', 'Languages')
+        global file_format
+        file_format = request.form.get('fileFormat', 'png')  # Extract the selected file format
+        print(file_format)
+        giveFig(False, df, custom_text, False, True, lw=1, dpi1=1300, l=18, b=8, colors=selected_colors, format=file_format)
         
-        fig_path = giveFig(False, df, "Languages", False, True, lw=1, dpi1=1500, l=24, b=8, colors=selected_colors)
-        
-        return render_template('result.html', img_path='static/results/plot.png')
+        return render_template('result.html', img_path=f'static/results/plot.png')
     
     return "Invalid file type"
 
 @app.route('/download')
 def download_file():
-    return send_file(os.path.join(app.config['RESULT_FOLDER'], 'plot.png'), as_attachment=True)
+    filename = f'plot.{file_format}'  # Update the file extension based on the format
+    print(filename)
+    return send_file(os.path.join(app.config['RESULT_FOLDER'], filename), as_attachment=True)
+
+
 
 @app.route('/colors/<filename>')
 def serve_color(filename):
     return send_file(f'colors/{filename}', mimetype='image/png')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    Timer(1, open_browser).start()
+    app.run(port=5000)
