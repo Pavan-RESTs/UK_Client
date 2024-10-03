@@ -202,7 +202,7 @@ def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,
                     spaces_to_add_second = threshold - len(second_line)
                     return f"{first_line}{' ' * spaces_to_add_first}\n{second_line}{' ' * spaces_to_add_second }"
                 spaces = threshold - len(label)
-                return f" {label}{' ' * spaces }"
+                return f"{label}{' ' * spaces }"
             else:
                 threshold = 31 
                 if len(label) > threshold:
@@ -221,7 +221,7 @@ def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,
                     spaces_to_add_second = threshold - len(second_line)
                     return f"{first_line}{' ' * spaces_to_add_first}\n{second_line}{' ' * spaces_to_add_second }"
                 spaces = threshold - len(label)
-                return f" {label}{' ' * spaces }"
+                return f"{label}{' ' * spaces }"
 
         return label
 
