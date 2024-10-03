@@ -16,11 +16,8 @@ from core_file import giveFig
 
 
 random.seed(38)
-def open_browser():
-    webbrowser.open_new('http://127.0.0.1:5000/')
 
 app = Flask(__name__)
-
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['RESULT_FOLDER'] = 'static/results'
@@ -86,5 +83,7 @@ def serve_color(filename):
     return send_file(f'colors/{filename}', mimetype='image/png')
 
 if __name__ == '__main__':
-    Timer(1, open_browser).start()
-    app.run(port=5000)
+    FlaskUI(app=app, server="flask").run()
+    # ui.run()
+    # Timer(1, open_browser).start()
+    # app.run(port=5000,debug=True)
