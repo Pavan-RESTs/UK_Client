@@ -11,10 +11,10 @@ def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,
     if whitey==False:
         lw = 0
     
-    tamil_font_path = r"Noto_Sans_Tamil\NIRMALA.TTF"
+    tamil_font_path = r"Fonts\Tamil Font.TTF"
     tamil_prop = fm.FontProperties(fname=tamil_font_path)
 
-    english_font_path = r"Luxi-Mono/luximr.ttf"
+    english_font_path = r"Fonts\English Font.ttf"
     english_prop = fm.FontProperties(fname=english_font_path)
 
     english_prop.set_size(7.7)
