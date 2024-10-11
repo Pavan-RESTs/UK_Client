@@ -8,17 +8,12 @@ import matplotlib.colors as mcolors
 from matplotlib import font_manager as fm
 import matplotlib.patches as patches
 import random
-import webbrowser
-from threading import Timer
 import json
 from core_file import giveFig
-
-
 
 random.seed(38)
 
 app = Flask(__name__)
-
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['RESULT_FOLDER'] = 'static/results'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -57,14 +52,14 @@ def upload_file():
     if file and file.filename.endswith('.csv'):
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'data.csv')
         file.save(filepath)
-        df = pd.read_csv(filepath)
+        df = pd.read_csv(filepath, encoding='utf-8')
         
         selected_colors = json.loads(request.form.get('selectedColors', '[]'))
         custom_text = request.form.get('customText', 'Languages')
-        global file_format
-        file_format = request.form.get('fileFormat', 'png')  # Extract the selected file format
-        print(file_format)
-        giveFig(False, df, custom_text, False, True, lw=1, dpi1=1300, l=18, b=8, colors=selected_colors, format=file_format)
+        file_format = request.form.get('fileFormat', 'png')
+        center_color = request.form.get('centerColor', 'white')  
+        
+        giveFig(False, df, custom_text, False, True, lw=1, dpi1=100, l=18, b=8, colors=selected_colors, format=file_format, center_color=center_color)  # Modified to include center_color
         
         return render_template('result.html', img_path=f'static/results/plot.png')
     
@@ -72,11 +67,8 @@ def upload_file():
 
 @app.route('/download')
 def download_file():
-    filename = f'plot.{file_format}'  # Update the file extension based on the format
-    print(filename)
+    filename = f'plot.{file_format}'
     return send_file(os.path.join(app.config['RESULT_FOLDER'], filename), as_attachment=True)
-
-
 
 @app.route('/colors/<filename>')
 def serve_color(filename):
@@ -84,6 +76,3 @@ def serve_color(filename):
 
 if __name__ == '__main__':
     FlaskUI(app=app, server="flask").run()
-    # ui.run()
-    # Timer(1, open_browser).start()
-    # app.run(port=5000,debug=True)

@@ -5,34 +5,13 @@ import matplotlib.colors as mcolors
 from matplotlib import font_manager as fm
 import matplotlib.patches as patches
 import random
+import matplotlib
 
-def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,l=7.2,b=7.2, colors = [], format="png"):
+def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,l=7.2,b=7.2, colors = [], format="png", center_color='white'):
     if whitey==False:
         lw = 0
-
-    def get_column_colors(categories, ask_user=False):
-        available_colors = list(mcolors.CSS4_COLORS.keys())
-        column_colors = []
-        for i, category in enumerate(categories):
-            if ask_user:
-                print(f"\nChoose a color for column '{category}':")
-                print("\nAvailable colors:", available_colors)
-                chosen_color = input("\nEnter color name or hex value: ").lower()
-
-                while chosen_color not in mcolors.CSS4_COLORS and chosen_color not in available_colors:
-                    print("Invalid color! Please choose from the available colors.")
-                    chosen_color = input("Enter color name or hex value: ").lower()
-
-                if chosen_color in available_colors:
-                    available_colors.remove(chosen_color)
-            else:
-                chosen_color = random.choice(available_colors)
-                available_colors.remove(chosen_color)
-
-            column_colors.append(chosen_color)
-        return column_colors
     
-    tamil_font_path = r"Noto_Sans_Tamil/NotoSansTamil-VariableFont_wdth,wght.ttf"
+    tamil_font_path = r"Noto_Sans_Tamil\NIRMALA.TTF"
     tamil_prop = fm.FontProperties(fname=tamil_font_path)
 
     english_font_path = r"Luxi-Mono/luximr.ttf"
@@ -137,7 +116,6 @@ def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,
         tamil_unicode_range = range(0x0B80, 0x0BFF)
         return any(ord(char) in tamil_unicode_range for char in text)
     
-
     def autopct_format(pct):
         threshold = 31
         label = outer_labels.pop(0)
@@ -230,8 +208,7 @@ def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,
         for i in range(0, clen):
             colors[i] = 'white'
     outer_wedges, outer_texts, outer_autotexts = ax.pie(outer_data, labels=None, startangle=-0, colors=colors,
-                                                        autopct=autopct_format, textprops={ 'fontproperties': english_prop}, wedgeprops=wedgeprops_outer if wedge1 else {})
-    
+                                                        autopct=autopct_format, textprops={'fontproperties': tamil_prop if is_tamil(label) else english_prop}, wedgeprops=wedgeprops_outer if wedge1 else {})
     
     pie_colors = column_colors
 
@@ -327,7 +304,7 @@ def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,
     y_outer = np.sin(np.deg2rad(angle))
     line, = ax.plot([x_outer, x_inner], [y_outer, y_inner], color='black', linewidth=lw)
 
-    circle = patches.Circle((0, 0), radius=circle_radius, edgecolor='black' if whitey else 'white', facecolor='white', linewidth=lw) 
+    circle = patches.Circle((0, 0), radius=circle_radius, edgecolor='black' if whitey else 'white', facecolor=center_color, linewidth=lw) 
     ax.add_artist(circle)
     
     circle_radius1 = 1 

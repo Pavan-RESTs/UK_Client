@@ -5,76 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Result</title>
     <style>
+      :root {
+        --bg-color: #0e0b1a;
+        --container-bg: #1a1528;
+        --primary-color: #8b5cf6;
+        --secondary-color: #c4b5fd;
+        --text-color: #e0e0e0;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
       html,
       body {
-        height: 100%; /* Ensure full height */
-        margin: 0; /* Remove default margin */
+        height: 100%;
+        margin: 0;
       }
+
       body {
-        font-family: Arial, sans-serif;
-        background-color: #222; /* Dark background */
-        color: #fff; /* Light text */
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
         display: flex;
         justify-content: center;
         align-items: center;
-        position: relative; /* Added to position the back button */
+        position: relative;
       }
+
       .container {
-        width: 100vw; /* Full viewport width */
-        height: 120vh; /* Full viewport height */
+        width: 100vw;
+        height: 120vh;
         margin: 0;
         padding: 0;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
+        animation: fadeIn 0.5s ease-out;
       }
+
       img {
-        width: 80vw; /* Full screen width */
-        height: 80vh; /* Full screen height */
-        object-fit: cover; /* Crop the image from horizontal sides */
+        width: 80vw;
+        height: 80vh;
+        object-fit: contain;
         margin: 0;
         padding: 0;
         border: none;
+        border-radius: 10px;
+        animation: fadeIn 1s ease-out;
       }
+
       .back-button {
         position: absolute;
-        top: 10px; /* Positioning at the top */
-        left: 10px; /* Positioning on the left */
+        top: 20px;
+        left: 20px;
         text-decoration: none;
-        background-color: transparent; /* Transparent background */
-        border: none; /* No border */
-        cursor: pointer; /* Pointer cursor on hover */
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease;
       }
+
       .back-button svg {
-        width: 24px; /* Width of the icon */
-        height: 24px; /* Height of the icon */
-        fill: #007bff; /* Color of the icon */
-        transform: scaleX(-1); /* Flip horizontally */
-        transition: transform 0.2s; /* Smooth transition for hover effect */
+        width: 30px;
+        height: 30px;
+        fill: var(--primary-color);
+        transform: scaleX(-1);
+        transition: fill 0.3s ease;
       }
+
+      .back-button:hover {
+        transform: translateX(-5px);
+      }
+
       .back-button:hover svg {
-        transform: scaleX(-1) scale(1.1); /* Slightly enlarge the icon on hover */
+        fill: var(--secondary-color);
       }
+
       .download-button {
-        margin-top: 20px;
-        position: absolute;
-        bottom: 20px; /* Positioning at the bottom */
+        margin-top: 30px;
         text-decoration: none;
-        color: #fff; /* Light text color */
-        font-size: 16px;
-        background-color: rgba(
-          0,
-          123,
-          255,
-          0.8
-        ); /* Slightly transparent blue */
-        padding: 12px 20px; /* Padding around text */
-        border-radius: 4px;
-        border: none; /* No border */
-        transition: background-color 0.2s; /* Smooth transition */
+        color: var(--text-color);
+        font-size: 18px;
+        background-color: var(--primary-color);
+        padding: 12px 25px;
+        border-radius: 25px;
+        border: none;
+        transition: all 0.3s ease;
+        animation: fadeIn 1.5s ease-out;
       }
+
       .download-button:hover {
-        background-color: rgba(0, 123, 255, 1); /* Solid blue on hover */
+        background-color: var(--secondary-color);
+        color: var(--bg-color);
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
       }
     </style>
   </head>
