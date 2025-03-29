@@ -5,12 +5,11 @@ import matplotlib.colors as mcolors
 from matplotlib import font_manager as fm
 import matplotlib.patches as patches
 import random
-import matplotlib
+import matplotlib as mpl
 
 def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,l=7.2,b=7.2, colors = [], format="png", center_color='white'):
     if whitey==False:
         lw = 0
-    
     tamil_font_path = r"Fonts\Tamil Font.TTF"
     tamil_prop = fm.FontProperties(fname=tamil_font_path)
 
@@ -276,7 +275,7 @@ def giveFig(wedge1,dfobj, fileName, whitey=False, label12=False, lw=1, dpi1=300,
             kw["arrowprops"].update({"connectionstyle": connectionstyle})
             ax.annotate( categories[zind], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                         
-                        horizontalalignment=horizontalalignment, **kw, fontproperties=english_prop2)
+                        horizontalalignment=horizontalalignment, **kw, fontproperties=tamil_prop if is_tamil(categories[zind]) else english_prop)
             zind += 1
 
     plt.axis('equal')

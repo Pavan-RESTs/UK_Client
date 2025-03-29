@@ -12,7 +12,6 @@ import json
 from core_file import giveFig
 
 random.seed(38)
-
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['RESULT_FOLDER'] = 'static/results'
@@ -56,10 +55,11 @@ def upload_file():
         
         selected_colors = json.loads(request.form.get('selectedColors', '[]'))
         custom_text = request.form.get('customText', 'Languages')
+        global file_format
         file_format = request.form.get('fileFormat', 'png')
         center_color = request.form.get('centerColor', 'white')  
         
-        giveFig(False, df, custom_text, False, True, lw=1, dpi1=100, l=18, b=8, colors=selected_colors, format=file_format, center_color=center_color)  # Modified to include center_color
+        giveFig(False, df, custom_text, False, True, lw=1, dpi1=300, l=18, b=8, colors=selected_colors, format=file_format, center_color=center_color)  # Modified to include center_color
         
         return render_template('result.html', img_path=f'static/results/plot.png')
     

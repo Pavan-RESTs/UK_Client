@@ -1,7 +1,7 @@
 @echo off
 
 REM Activate the virtual environment
-call .venv\Scripts\activate
+call conda activate base
 
 REM Run the Flask application
 python app.py
