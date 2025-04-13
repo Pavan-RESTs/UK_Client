@@ -9,70 +9,97 @@ from matplotlib import font_manager as fm
 import matplotlib.patches as patches
 import random
 import json
+import sys
 from core_file import giveFig
 
+os.chdir(os.path.join(os.getcwd(), "_internal"))
+
 random.seed(38)
+
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['RESULT_FOLDER'] = 'static/results'
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['RESULT_FOLDER'], exist_ok=True)
+app.config["UPLOAD_FOLDER"] = "uploads"
+app.config["RESULT_FOLDER"] = "static/results"
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+os.makedirs(app.config["RESULT_FOLDER"], exist_ok=True)
 
-@app.route('/')
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller extracts resources to a temporary directory at runtime
+        base_path = sys._MEIPASS
+    except AttributeError:
+        # Running in a normal Python environment (development mode)
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/process_csv', methods=['POST'])
+
+@app.route("/process_csv", methods=["POST"])
 def process_csv():
-    if 'file' not in request.files:
+    if "file" not in request.files:
         return jsonify({"error": "No file part"})
-    
-    file = request.files['file']
-    if file.filename == '':
+
+    file = request.files["file"]
+    if file.filename == "":
         return jsonify({"error": "No selected file"})
-    
-    if file and file.filename.endswith('.csv'):
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'data.csv')
+
+    if file and file.filename.endswith(".csv"):
+        filepath = os.path.join(app.config["UPLOAD_FOLDER"], "data.csv")
         file.save(filepath)
         df = pd.read_csv(filepath)
         return jsonify({"column_count": len(df.columns)})
-    
+
     return jsonify({"error": "Invalid file type"})
 
-@app.route('/upload', methods=['POST'])
+
+@app.route("/upload", methods=["POST"])
 def upload_file():
-    if 'file' not in request.files:
+    if "file" not in request.files:
         return "No file part"
-    
-    file = request.files['file']
-    if file.filename == '':
+
+    file = request.files["file"]
+    if file.filename == "":
         return "No selected file"
-    
-    if file and file.filename.endswith('.csv'):
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'data.csv')
+
+    if file and file.filename.endswith(".csv"):
+        filepath = os.path.join(app.config["UPLOAD_FOLDER"], "data.csv")
         file.save(filepath)
-        df = pd.read_csv(filepath, encoding='utf-8')
-        
-        selected_colors = json.loads(request.form.get('selectedColors', '[]'))
-        custom_text = request.form.get('customText', 'Languages')
+        df = pd.read_csv(filepath, encoding="utf-8")
+
+        selected_colors = json.loads(request.form.get("selectedColors", "[]"))
+        custom_text = request.form.get("customText", "Languages")
         global file_format
-        file_format = request.form.get('fileFormat', 'png')
-        center_color = request.form.get('centerColor', 'white')  
-        
-        giveFig(False, df, custom_text, False, True, lw=1, dpi1=300, l=18, b=8, colors=selected_colors, format=file_format, center_color=center_color)  # Modified to include center_color
-        
-        return render_template('result.html', img_path=f'static/results/plot.png')
-    
+        file_format = request.form.get("fileFormat", "png")
+        center_color = request.form.get("centerColor", "white")
+
+        giveFig(
+            False,
+            df,
+            custom_text,
+            False,
+            True,
+            lw=1,
+            dpi1=1400,
+            l=18,
+            b=8,
+            colors=selected_colors,
+            format=file_format,
+            center_color=center_color,
+        )  # Modified to include center_color
+
+        return render_template(
+            "result.html", img_path=f"static/results/plot.{file_format}"
+        )
+
     return "Invalid file type"
 
-@app.route('/download')
+
+@app.route("/download")
 def download_file():
-    filename = f'plot.{file_format}'
-    return send_file(os.path.join(app.config['RESULT_FOLDER'], filename), as_attachment=True)
-
-@app.route('/colors/<filename>')
-def serve_color(filename):
-    return send_file(f'colors/{filename}', mimetype='image/png')
-
-if __name__ == '__main__':
-    FlaskUI(app=app, server="flask").run()
+    filename = f"plot.{file_format}"
+    return send_file(
+        os.path.join(app.config["RESULT_FOLDER"], filename), as_attachment=True
+    )
