@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pie Chart Generator</title>
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+    />
+
+    <style>
+      :root {
+        --bg-color: #0e0b1a;
+        --container-bg: #1a1528;
+        --primary-color: #8b5cf6;
+        --secondary-color: #c4b5fd;
+        --text-color: #e0e0e0;
+        --input-bg: #2c2440;
+        --card-bg: #231c3a;
+      }
+
+      @keyframes radiantPulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        background: var(--container-bg);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        max-width: 800px;
+        width: 100%;
+      }
+
+      h1 {
+        margin-bottom: 30px;
+        color: var(--secondary-color);
+        font-size: 2.5em;
+        animation: fadeIn 1s ease-out;
+      }
+
+      input[type="file"] {
+        margin-bottom: 20px;
+        background-color: var(--input-bg);
+        color: var(--text-color);
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        width: calc(100% - 20px);
+        transition: background-color 0.3s ease;
+      }
+
+      input[type="file"]:hover {
+        background-color: #3d3256;
+      }
+
+      input[type="submit"] {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        animation: radiantPulse 2s infinite;
+      }
+
+      input[type="submit"]:hover {
+        background-color: var(--secondary-color);
+        color: var(--bg-color);
+        transform: scale(1.05);
+      }
+
+      input[type="submit"]:disabled {
+        background-color: #4a4a6a;
+        cursor: not-allowed;
+        animation: none;
+      }
+
+      #colorSelection {
+        display: none;
+        margin-top: 20px;
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      #colorGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+        gap: 10px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      .color-img-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: var(--card-bg);
+        padding: 5px;
+        border-radius: 8px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .color-img-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.2);
+      }
+
+      .color-img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-bottom: 5px;
+        transition: transform 0.2s ease;
+      }
+
+      .color-img-container:hover .color-img {
+        transform: scale(1.1);
+      }
+
+      #customText,
+      #fileFormat {
+        width: calc(100% - 20px);
+        padding: 12px;
+        border: 1px solid var(--secondary-color);
+        border-radius: 5px;
+        font-size: 16px;
+        margin-bottom: 15px;
+        background-color: var(--input-bg);
+        color: var(--text-color);
+        transition: all 0.3s ease;
+      }
+
+      #customText:focus,
+      #fileFormat:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        outline: none;
+        transform: translateY(-2px);
+      }
+
+      #customText:hover,
+      #fileFormat:hover {
+        background-color: #3d3256;
+      }
+
+      #colorCount {
+        margin-top: 15px;
+        font-weight: bold;
+        color: var(--secondary-color);
+        transition: color 0.3s ease;
+      }
+
+      .spinner {
+        margin: 20px auto;
+        width: 50px;
+        height: 50px;
+        border: 5px solid var(--secondary-color);
+        border-top: 5px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Pie Chart Generator</h1>
+      <form
+        id="uploadForm"
+        action="/upload"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <input type="file" name="file" accept=".csv" id="csvFile" />
+        <div id="colorCount"></div>
+        <div id="colorSelection">
+          <div id="colorGrid">
+            <!-- Color images and checkboxes will be dynamically added here -->
+          </div>
+        </div>
+        <input
+          type="text"
+          id="customText"
+          placeholder="Enter plot name (Up to 12 Characters)"
+        />
+        <select id="fileFormat">
+          <option value="png">PNG (Transparent)</option>
+          <option value="jpg">JPG</option>
+          <option value="jpeg">JPEG</option>
+        </select>
+        <input
+          type="submit"
+          value="Generate Pie Chart"
+          id="submitBtn"
+          disabled
+        />
+      </form>
+      <div id="loading" style="display: none; text-align: center">
+        <div class="spinner"></div>
+        <p>Generating your pie chart...</p>
+      </div>
+    </div>
+    <script>
+      // The JavaScript remains the same as in the original file
+      const csvFile = document.getElementById("csvFile");
+      const colorSelection = document.getElementById("colorSelection");
+      const colorGrid = document.getElementById("colorGrid");
+      const submitBtn = document.getElementById("submitBtn");
+      const uploadForm = document.getElementById("uploadForm");
+      const colorCountDiv = document.getElementById("colorCount");
+
+      let requiredColors = 0;
+
+      csvFile.addEventListener("change", async (event) => {
+        const file = event.target.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("/process_csv", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        requiredColors = data.column_count + 1;
+
+        colorGrid.innerHTML = "";
+        colorSelection.style.display = "block";
+        updateColorCount(0);
+
+        const colors = [
+          "aliceblue",
+          "antiquewhite",
+          "aqua",
+          "aquamarine",
+          "azure",
+          "beige",
+          "bisque",
+          "black",
+          "blanchedalmond",
+          "blue",
+          "blueviolet",
+          "brown",
+          "burlywood",
+          "cadetblue",
+          "chartreuse",
+          "chocolate",
+          "coral",
+          "cornflowerblue",
+          "cornsilk",
+          "crimson",
+          "cyan",
+          "darkblue",
+          "darkcyan",
+          "darkgoldenrod",
+          "darkgray",
+          "darkgreen",
+          "darkgrey",
+          "darkkhaki",
+          "darkmagenta",
+          "darkolivegreen",
+          "darkorange",
+          "darkorchid",
+          "darkred",
+          "darksalmon",
+          "darkseagreen",
+          "darkslateblue",
+          "darkslategray",
+          "darkslategrey",
+          "darkturquoise",
+          "darkviolet",
+          "deeppink",
+          "deepskyblue",
+          "dimgray",
+          "dimgrey",
+          "dodgerblue",
+          "firebrick",
+          "floralwhite",
+          "forestgreen",
+          "fuchsia",
+          "gainsboro",
+          "ghostwhite",
+          "gold",
+          "goldenrod",
+          "gray",
+          "green",
+          "greenyellow",
+          "grey",
+          "honeydew",
+          "hotpink",
+          "indianred",
+          "indigo",
+          "ivory",
+          "khaki",
+          "lavender",
+          "lavenderblush",
+          "lawngreen",
+          "lemonchiffon",
+          "lightblue",
+          "lightcoral",
+          "lightcyan",
+          "lightgoldenrodyellow",
+          "lightgray",
+          "lightgreen",
+          "lightgrey",
+          "lightpink",
+          "lightsalmon",
+          "lightseagreen",
+          "lightskyblue",
+          "lightslategray",
+          "lightslategrey",
+          "lightsteelblue",
+          "lightyellow",
+          "lime",
+          "limegreen",
+          "linen",
+          "magenta",
+          "maroon",
+          "mediumaquamarine",
+          "mediumblue",
+          "mediumorchid",
+          "mediumpurple",
+          "mediumseagreen",
+          "mediumslateblue",
+          "mediumspringgreen",
+          "mediumturquoise",
+          "mediumvioletred",
+          "midnightblue",
+          "mintcream",
+          "mistyrose",
+          "moccasin",
+          "navajowhite",
+          "navy",
+          "oldlace",
+          "olive",
+          "olivedrab",
+          "orange",
+          "orangered",
+          "orchid",
+          "palegoldenrod",
+          "palegreen",
+          "paleturquoise",
+          "palevioletred",
+          "papayawhip",
+          "peachpuff",
+          "peru",
+          "pink",
+          "plum",
+          "powderblue",
+          "purple",
+          "rebeccapurple",
+          "red",
+          "rosybrown",
+          "royalblue",
+          "saddlebrown",
+          "salmon",
+          "sandybrown",
+          "seagreen",
+          "seashell",
+          "sienna",
+          "silver",
+          "skyblue",
+          "slateblue",
+          "slategray",
+          "slategrey",
+          "snow",
+          "springgreen",
+          "steelblue",
+          "tan",
+          "teal",
+          "thistle",
+          "tomato",
+          "turquoise",
+          "violet",
+          "wheat",
+          "white",
+          "whitesmoke",
+          "yellow",
+          "yellowgreen",
+        ];
+
+        colors.forEach((color, index) => {
+          const colorImgContainer = document.createElement("div");
+          colorImgContainer.className = "color-img-container";
+
+          const img = document.createElement("div");
+          img.style.backgroundColor = color;
+          img.className = "color-img";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "colors";
+          checkbox.value = color;
+          checkbox.dataset.index = index;
+
+          colorImgContainer.appendChild(img);
+          colorImgContainer.appendChild(checkbox);
+          colorGrid.appendChild(colorImgContainer);
+        });
+
+        const checkboxes = document.querySelectorAll('input[name="colors"]');
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("change", () => {
+            const checkedCount = document.querySelectorAll(
+              'input[name="colors"]:checked'
+            ).length;
+            updateColorCount(checkedCount);
+            submitBtn.disabled = checkedCount !== requiredColors;
+          });
+        });
+      });
+
+      function updateColorCount(selectedCount) {
+        colorCountDiv.textContent = `Select ${requiredColors} colors (${selectedCount}/${requiredColors} selected)`;
+      }
+
+      uploadForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        document.getElementById("loading").style.display = "block";
+
+        const formData = new FormData(uploadForm);
+        const selectedColors = Array.from(
+          document.querySelectorAll('input[name="colors"]:checked')
+        ).map((checkbox) => checkbox.value);
+        const centerColor = selectedColors.pop();
+        const customText = document.getElementById("customText").value;
+        const fileFormat = document.getElementById("fileFormat").value;
+
+        formData.append("centerColor", centerColor);
+        formData.append("selectedColors", JSON.stringify(selectedColors));
+        formData.append("customText", customText);
+        formData.append("fileFormat", fileFormat);
+
+        fetch("/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.text())
+          .then((html) => {
+            document.body.innerHTML = html;
+          });
+      });
+    </script>
+  </body>
+</html>
