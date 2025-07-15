@@ -12,7 +12,6 @@ import json
 import sys
 from core_file import giveFig
 
-os.chdir(os.path.join(os.getcwd(), "_internal"))
 
 random.seed(38)
 
